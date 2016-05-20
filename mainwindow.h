@@ -4,6 +4,17 @@
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QHostAddress>
+#include <QString>
+
+
+typedef struct stMsg
+{
+    QByteArray msg;
+    QByteArray userId;
+}STMSG;
+
+
+
 
 namespace Ui {
 class MainWindow;
@@ -26,7 +37,7 @@ private slots:
     void on_lineEdit_msg_returnPressed();
 
 private:
-    QTcpSocket socket;
+    QTcpSocket m_socket;
     Ui::MainWindow *ui;
 };
 
