@@ -13,8 +13,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    clogindlg.cpp \
+    cgbdatamanager.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    clogindlg.h \
+    cgbdatamanager.h
 
-FORMS    += mainwindow.ui
+
+
+
+FORMS    += mainwindow.ui \
+    logindlg.ui

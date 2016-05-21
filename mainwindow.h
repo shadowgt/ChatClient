@@ -1,18 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QString>
+#include <cgbdatamanager.h>
 
 
-typedef struct stMsg
-{
-    QByteArray msg;
-    QByteArray userId;
-}STMSG;
-
+#define DEF_TYPE_MESSAGE quint16(1)
+#define DEF_TYPE_FILE quint16(2)
 
 
 
@@ -22,6 +20,7 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
+
     Q_OBJECT
 
 public:
@@ -35,6 +34,8 @@ public slots:
 private slots:
     void on_pushButton_connect_clicked();
     void on_lineEdit_msg_returnPressed();
+
+    void on_pushButton_fileSend_clicked();
 
 private:
     QTcpSocket m_socket;
