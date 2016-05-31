@@ -6,21 +6,17 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QString>
-#include <cgbdatamanager.h>
-
-
-#define DEF_TYPE_MESSAGE quint16(1)
-#define DEF_TYPE_FILE quint16(2)
-
+#include "cgbdatamanager.h"
+#include "clogin.h"
+#include "define.h"
 
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow ,CLogin
 {
-
     Q_OBJECT
 
 public:
@@ -34,11 +30,10 @@ public slots:
 private slots:
     void on_pushButton_connect_clicked();
     void on_lineEdit_msg_returnPressed();
-
     void on_pushButton_fileSend_clicked();
 
 private:
-    QTcpSocket m_socket;
+
     Ui::MainWindow *ui;
 };
 

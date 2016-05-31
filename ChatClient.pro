@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,11 +15,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     clogindlg.cpp \
-    cgbdatamanager.cpp
+    cgbdatamanager.cpp \
+    clogin.cpp
 
 HEADERS  += mainwindow.h \
     clogindlg.h \
-    cgbdatamanager.h
+    cgbdatamanager.h \
+    clogin.h \
+    define.h
 
 
 

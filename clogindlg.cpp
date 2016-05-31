@@ -11,11 +11,11 @@ CLoginDlg::CLoginDlg(QWidget *parent) :
 
 CLoginDlg::~CLoginDlg()
 {
-
     delete ui;
 }
 
 void CLoginDlg::on_buttonBox_clicked(QAbstractButton *button)
 {
-    CGBDataManager::Instance().setID(ui->lineEdit->text());
+    CGBDataManager::Instance().setID(ui->lineEdit_ID->text());
+    CGBDataManager::Instance().setPassword(ui->lineEdit_Password->text());
 }
