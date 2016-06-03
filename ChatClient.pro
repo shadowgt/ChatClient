@@ -16,16 +16,19 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     clogindlg.cpp \
     cgbdatamanager.cpp \
-    clogin.cpp
+    clogin.cpp \
+    csettingsdlg.cpp
 
 HEADERS  += mainwindow.h \
     clogindlg.h \
     cgbdatamanager.h \
     clogin.h \
-    define.h
+    define.h \
+    csettingsdlg.h
 
 
 
 
 FORMS    += mainwindow.ui \
-    logindlg.ui
+    logindlg.ui \
+    csettingsdlg.ui

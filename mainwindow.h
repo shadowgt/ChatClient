@@ -9,7 +9,8 @@
 #include "cgbdatamanager.h"
 #include "clogin.h"
 #include "define.h"
-
+#include "csettingsdlg.h"
+#include "clogindlg.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,16 +25,16 @@ public:
     ~MainWindow();
 
 public slots:
-    void sendMessage();
     void recvMsg();
+    void reciveData(const QString &text);
 
 private slots:
-    void on_pushButton_connect_clicked();
+
     void on_lineEdit_msg_returnPressed();
     void on_pushButton_fileSend_clicked();
 
 private:
-
+    CLoginDlg m_login;
     Ui::MainWindow *ui;
 };
 

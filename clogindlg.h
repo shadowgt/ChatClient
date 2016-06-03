@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <cgbdatamanager.h>
 #include <QAbstractButton>
+#include "csettingsdlg.h"
 
 namespace Ui {
 class CLoginDlg;
@@ -13,12 +14,19 @@ class CLoginDlg : public QDialog
 {
     Q_OBJECT
 
+signals:
+    void sendData(const QString &text);
+
 public:
     explicit CLoginDlg(QWidget *parent = 0);
     ~CLoginDlg();
 
+
 private slots:
-    void on_buttonBox_clicked(QAbstractButton *button);
+    void on_pushButton_settings_clicked();
+    void on_pushButton_OK_clicked();
+    void on_pushButton_exit_clicked();
+
 
 private:
     Ui::CLoginDlg *ui;

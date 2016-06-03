@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
-#include "clogindlg.h"
 
 
 
@@ -12,25 +11,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(&m_socket,SIGNAL(readyRead()),this,SLOT(recvMsg()));
+    connect(&m_login,SIGNAL(sendData(QString)),
+            this,SLOT(reciveData(QString)));
 
-    LoginIDCheck(&m_socket);
-
-    this->show();
-
-    //setting
-    ui->lineEdit_ip->setText("127.0.0.1");
-    ui->lineEdit_port->setText("30000");
-
+    m_login.show();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::sendMessage()
-{
-
 }
 
 
@@ -76,23 +65,84 @@ void MainWindow::recvMsg()
                 nextBlockSize = 0;
 
             }
+            else if(msgType == DEF_TYPE_CHANNEL_CHANGE)
+            {
+                ui->textEdit->clear();
+                ui->textEdit->setFontUnderline(true);
+                QByteArray arr;
+                dataStream>>arr;
+                QString str;
+                str.append(arr.data()); // ID
+                ui->textEdit->append(str);
+                ui->textEdit->setFontUnderline(false);
+
+                nextBlockSize = 0;
+            }
             else if(msgType == DEF_TYPE_FILE)
             {
                 qDebug() << "File received";
             }
             else if(msgType == DEF_TYPE_TRY_LOGIN)
             {
-                QByteArray arr;
+
                 quint16 value;
                 dataStream>>value;
                 if(value==1)
                 {
-                    ui->textEdit->append("연결되었습니다.");
+                    QString str;
+                    QTextStream textStream(&str);
+
+                    textStream << "username \""
+                               << CGBDataManager().Instance().getID()
+                               << "\" "
+                               << CGBDataManager().Instance().getIp()
+                               << " "
+                               << CGBDataManager().Instance().getPort()
+                               << " port connected";
+
+                    ui->textEdit->append(textStream.readAll());
+                    ui->textEdit->append("#everyone channel joined");
+                    this->show();
+                    m_login.hide();
                 }
                 else
                 {
-                    ui->textEdit->append("잘못된 연결");
-                    //tryConnect();
+                    //ui->textEdit->append("잘못된 연결");
+                    qDebug() << " 잘못된 연결";
+
+                    bool bCheck = false;
+
+                    // if ID not null , you can try to login as geust
+                    if(CGBDataManager::Instance().getID().size()!=0)
+                    {
+                        QMessageBox msgBox;
+                        msgBox.setText("Do you want to login as geust ?");
+                        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+                        int nCheck = msgBox.exec();
+                        if(nCheck == QMessageBox::Ok)
+                        {
+                            connectServer(true);
+                        }
+                        else
+                        {
+                            bCheck = true;
+                        }
+                    }
+                    else
+                    {
+                        bCheck = true;
+                    }
+
+                    if(bCheck = true)
+                    {
+                        this->hide();
+                        m_login.show();
+                        m_login.setEnabled(true);
+                    }
+
+
+
+
                 }
             }
             break;
@@ -101,32 +151,52 @@ void MainWindow::recvMsg()
     //qDebug() << "ok";
 }
 
-
-void MainWindow::on_pushButton_connect_clicked()
+void MainWindow::reciveData(const QString &text)
 {
-    QString host_str(ui->lineEdit_ip->text());
-    int port = ui->lineEdit_port->text().toInt();
-    m_socket.connectToHost(host_str,port);
-
-
-    if(m_socket.waitForConnected(1000))
+    qDebug() << "test :" <<text;
+    if(connectServer() == false)
     {
-        tryConnect();
-    }
-    else
-    {
-        qDebug() << "연결 안됨";
+        m_login.setEnabled(true);
+        m_login.show();
     }
 }
 
+
+
+
 void MainWindow::on_lineEdit_msg_returnPressed()
 {
-    QByteArray buffer(ui->lineEdit_msg->text().toUtf8());
 
-    QByteArray block ,chk;
+    QByteArray block;
     QDataStream dataStream(&block , QIODevice::ReadWrite);
     dataStream<<quint16(0);
-    dataStream<<DEF_TYPE_MESSAGE;
+
+    QString strData = ui->lineEdit_msg->text().toUtf8();
+    QString strBuffer;
+    if(strData.toUtf8().at(0) == '#')
+    {
+        dataStream<<DEF_TYPE_CHANNEL_CHANGE;
+        strData.remove(QChar('#'), Qt::CaseInsensitive);
+
+        foreach(QChar ch , strData)
+        {
+            if(ch == '#')
+                continue;
+            else if(ch == ' ')
+                break;
+            else
+                strBuffer.append(ch);
+        }
+        strData = strBuffer;
+        qDebug() << "채널" << strBuffer << "접속 시도";
+    }
+    else
+    {
+        dataStream<<DEF_TYPE_MESSAGE;
+    }
+
+
+    QByteArray buffer(strData.toUtf8());
     dataStream<<quint16(buffer.size());
     qDebug() << CGBDataManager::Instance().getID().toUtf8();
     dataStream<<CGBDataManager::Instance().getID().toUtf8();
@@ -144,8 +214,15 @@ void MainWindow::on_lineEdit_msg_returnPressed()
     qDebug() << chk.data();
 */
     //소켓으로 전송
-    m_socket.write(block);
     ui->lineEdit_msg->clear();
+    int nCheck = m_socket.write(block);
+
+    if(nCheck == -1)
+    {
+        m_login.show();
+        m_login.setEnabled(true);
+        this->hide();
+    }
 }
 
 void MainWindow::on_pushButton_fileSend_clicked()

@@ -8,8 +8,8 @@ class CLogin
 public:
     CLogin();
 
-    void LoginIDCheck(QTcpSocket * s);
-    void tryConnect();
+    void sendLoginData(bool i_b = false);
+    bool connectServer(bool i_b = false);
 
 protected:
     QTcpSocket m_socket;
