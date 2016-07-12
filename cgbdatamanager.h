@@ -31,28 +31,69 @@ public:
         m_Port = i_str;
     }
 
+    void setName(QString i_str)
+    {
+        m_Name = i_str;
+    }
+
+    void setStatus(int i_n)
+    {
+        m_Status = i_n;
+    }
+
+
+
     QString getID()
     {
-        return m_ID;
+        QString buf = m_ID;
+        m_ID.clear();
+
+        return buf;
     }
 
     QString getPassword()
     {
-        return m_Password;
+        QString buf = m_Password;
+        m_Password.clear();
+
+        return buf;
     }
 
     QString getIp()
     {
-        return m_Ip;
+        QString buf = m_Ip;
+        m_Ip.clear();
+
+        return buf;
     }
 
     QString getPort()
     {
-        return m_Port;
+        QString buf = m_Port;
+        m_Port.clear();
+
+        return buf;
+    }
+
+    QString getName()
+    {
+        QString buf = m_Name;
+        m_Name.clear();
+
+        return buf;
+    }
+
+    int getStatus()
+    {
+        int buf = m_Status;
+        m_Status = 0;
+
+        return buf;
     }
 
 private:
-    QString m_ID , m_Password , m_Port , m_Ip;
+    QString m_ID , m_Password , m_Port , m_Ip, m_Name;
+    int m_Status;
 
 
 

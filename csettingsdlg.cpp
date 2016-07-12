@@ -77,6 +77,8 @@ void CSettingsDlg::setDataMng()
     CGBDataManager::Instance().setPort(ui->lineEdit_port->text());
     qDebug() << "set IP "<< ui->lineEdit_ip->text();
     qDebug() << "set port" <<  ui->lineEdit_port->text();
+
+    emit this->sendData("Set_Settings");
 }
 
 
@@ -99,8 +101,7 @@ void CSettingsDlg::on_pushButton_ok_clicked()
         qDebug("it was not open");
     }
 
-    CGBDataManager::Instance().setIp(ui->lineEdit_ip->text());
-    CGBDataManager::Instance().setPort(ui->lineEdit_port->text());
+    setDataMng();
 
     file.close();
     close();

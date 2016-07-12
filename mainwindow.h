@@ -11,6 +11,7 @@
 #include "define.h"
 #include "csettingsdlg.h"
 #include "clogindlg.h"
+#include "csignupdlg.h"
 
 namespace Ui {
 class MainWindow;
@@ -32,6 +33,8 @@ private slots:
 
     void on_lineEdit_msg_returnPressed();
     void on_pushButton_fileSend_clicked();
+
+    void on_pushButton_msgSend_clicked();
 
 private:
     CLoginDlg m_login;

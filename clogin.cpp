@@ -13,21 +13,21 @@ void CLogin::sendLoginData(bool i_b)
 
     QByteArray block;
     QDataStream dataStream(&block,QIODevice::ReadWrite);
-    QByteArray arrID(CGBDataManager::Instance().getID().toUtf8());
     QByteArray arrPassword;
-
-
+    QByteArray arrID(m_ID.toUtf8());
     if(i_b == true)
     {
-        QString str = CGBDataManager::Instance().getID().toUtf8();
+        QString str = m_ID.toUtf8();
         str.append("_guest");
-        CGBDataManager::Instance().setID(str);
+        m_ID = str;
         arrPassword.append("guest");
     }
     else
     {
-        arrPassword.append(CGBDataManager::Instance().getPassword().toUtf8());
+        arrPassword.append(m_Password.toUtf8());
     }
+
+
 
 
     dataStream << quint16(0);
@@ -36,8 +36,12 @@ void CLogin::sendLoginData(bool i_b)
     dataStream << quint16(arrID.size()+arrPassword.size());
 
     dataStream << arrID;
-    dataStream << arrPassword;
-    dataStream.device()->seek(0);
+
+    // Password Sha3 알고리즘으로 암호화
+    QCryptographicHash * hash;
+    QString strPassword(arrPassword.data());
+    QByteArray arrHash(hash->hash(strPassword.toLatin1(), QCryptographicHash::Sha3_512));
+    dataStream << arrHash.toHex();
 
     qDebug() << "is open "<<m_socket.isOpen();
 
@@ -53,11 +57,49 @@ void CLogin::sendLoginData(bool i_b)
         qDebug() << "로그인 블록 전송";
 }
 
+void CLogin::sendSignUp()
+{
+    QByteArray block;
+    QDataStream dataStream(&block,QIODevice::ReadWrite);
+    QByteArray arrID(m_ID.toUtf8());
+    QByteArray arrPassword(m_Password.toUtf8());
+    QByteArray arrName(m_Name.toUtf8());
+    quint16 usStatus = quint16(m_Status);
+
+    dataStream << quint16(0);
+    dataStream << quint16(DEF_TYPE_SIGN_UP);
+
+    dataStream << quint16(arrID.size()+arrPassword.size());
+
+    dataStream << arrID;
+
+    // Password Sha3 알고리즘으로 암호화
+    QCryptographicHash * hash;
+    QString strPassword(arrPassword.data());
+    QByteArray arrHash(hash->hash(strPassword.toLatin1(), QCryptographicHash::Sha3_512));
+    dataStream << arrHash.toHex();
+
+    dataStream << arrName;
+    dataStream << usStatus;
+    dataStream.device()->seek(0);
+
+    qDebug() << " block size : " << arrID.size() << " " << arrPassword.size();
+
+
+    qint64 flag = m_socket.write(block);
+    if(flag == -1)
+    {
+        qDebug() << "회원가입 블록 전송 실패";
+    }
+    else
+        qDebug() << "회원가입 블록 전송";
+}
+
 bool CLogin::connectServer(bool i_b)
 {
     bool bCheck = false;
-    QString host_str(CGBDataManager::Instance().getIp());
-    int port = CGBDataManager::Instance().getPort().toInt();
+    QString host_str(m_Ip);
+    int port = m_Port.toInt();
     m_socket.connectToHost(host_str,port);
 
 
@@ -65,7 +107,7 @@ bool CLogin::connectServer(bool i_b)
     {
         bCheck = true;
         qDebug() << "로그인시도";
-        sendLoginData(i_b);
+
 
     }
     else

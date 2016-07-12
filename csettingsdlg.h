@@ -12,6 +12,8 @@ class CSettingsDlg;
 class CSettingsDlg : public QDialog
 {
     Q_OBJECT
+signals:
+    void sendData(const QString &text);
 
 public:
     explicit CSettingsDlg(QWidget *parent = 0);

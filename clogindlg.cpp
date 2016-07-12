@@ -8,10 +8,8 @@ CLoginDlg::CLoginDlg(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    CSettingsDlg SettingsDlg;
-    SettingsDlg.setDataMng(); //get port , ip
     ui->lineEdit_Password->setEchoMode(QLineEdit::Password);
-
+    m_SettingsDlg.setDataMng();
 }
 
 CLoginDlg::~CLoginDlg()
@@ -19,22 +17,39 @@ CLoginDlg::~CLoginDlg()
     delete ui;
 }
 
+void CLoginDlg::initData()
+{
+    ui->lineEdit_ID->setText("");
+    ui->lineEdit_Password->setText("");
+}
+
 
 void CLoginDlg::on_pushButton_settings_clicked()
 {
-    CSettingsDlg SettingsDlg;
-    SettingsDlg.exec();
+    m_SettingsDlg.exec();
 }
 
 void CLoginDlg::on_pushButton_OK_clicked()
 {
+
     CGBDataManager::Instance().setID(ui->lineEdit_ID->text());
     CGBDataManager::Instance().setPassword(ui->lineEdit_Password->text());
-    this->setEnabled(false);
-    emit this->sendData("Start");
+
+    if(ui->lineEdit_ID->text().size()==0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("ID 를 입력해주세요.");
+        msgBox.exec();
+    }
+    else
+    {
+        this->setEnabled(false);
+        emit this->sendData("Login_Dialog_Button_OK");
+    }
 }
 
-void CLoginDlg::on_pushButton_exit_clicked()
+
+void CLoginDlg::on_pushButton_SignUp_clicked()
 {
-    this->close();
+    m_SignUpDlg.exec();
 }

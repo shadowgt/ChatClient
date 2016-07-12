@@ -6,82 +6,87 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>265</width>
-    <height>105</height>
+    <width>241</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Login</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>11</x>
-     <y>11</y>
-     <width>239</width>
-     <height>87</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0" colspan="3">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0" colspan="2">
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLineEdit" name="lineEdit_ID"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_Id">
-          <property name="text">
-           <string>ID</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLineEdit" name="lineEdit_Password">
-          <property name="inputMask">
-           <string/>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="label_Password">
-          <property name="text">
-           <string>Password</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="pushButton_OK">
-      <property name="text">
-       <string>OK</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QPushButton" name="pushButton_exit">
-      <property name="text">
-       <string>Exit</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QPushButton" name="pushButton_settings">
-      <property name="text">
-       <string>Settings</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QFormLayout" name="formLayout_2">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="1" column="0">
+      <widget class="QPushButton" name="pushButton_SignUp">
+       <property name="text">
+        <string>Sign Up</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0" colspan="2">
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLineEdit" name="lineEdit_ID"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_Id">
+             <property name="text">
+              <string>ID</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLineEdit" name="lineEdit_Password">
+             <property name="inputMask">
+              <string/>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="label_Password">
+             <property name="text">
+              <string>Password</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="pushButton_OK">
+         <property name="text">
+          <string>OK</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="pushButton_settings">
+         <property name="text">
+          <string>Settings</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton_OK</tabstop>
+  <tabstop>lineEdit_ID</tabstop>
+  <tabstop>lineEdit_Password</tabstop>
+  <tabstop>pushButton_settings</tabstop>
+  <tabstop>pushButton_SignUp</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

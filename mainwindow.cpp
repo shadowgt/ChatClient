@@ -11,10 +11,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(&m_socket,SIGNAL(readyRead()),this,SLOT(recvMsg()));
+    connect(&(m_login.m_SignUpDlg),SIGNAL(sendData(QString)),
+            this,SLOT(reciveData(QString)));
+    connect(&(m_login.m_SettingsDlg),SIGNAL(sendData(QString)),
+            this,SLOT(reciveData(QString)));
     connect(&m_login,SIGNAL(sendData(QString)),
             this,SLOT(reciveData(QString)));
 
     m_login.show();
+    emit m_login.sendData("Set_Settings");
 }
 
 MainWindow::~MainWindow()
@@ -59,9 +64,18 @@ void MainWindow::recvMsg()
             {
                 QByteArray arr;
                 dataStream>>arr;
-                QString str;
-                str.append(arr.data()); // ID
-                ui->textEdit->append(str);
+                QString strID = arr.data();
+                dataStream>>arr;
+                QString strMessage = arr.data();
+
+                QString buffer;
+                buffer.append(strID);
+                buffer.append(" : ");
+                buffer.append(strMessage);
+
+
+                //str.append(arr.toHex()); // ID
+                ui->textEdit->append(buffer);
                 nextBlockSize = 0;
 
             }
@@ -93,11 +107,11 @@ void MainWindow::recvMsg()
                     QTextStream textStream(&str);
 
                     textStream << "username \""
-                               << CGBDataManager().Instance().getID()
+                               << m_ID
                                << "\" "
-                               << CGBDataManager().Instance().getIp()
+                               << m_Ip
                                << " "
-                               << CGBDataManager().Instance().getPort()
+                               << m_Port
                                << " port connected";
 
                     ui->textEdit->append(textStream.readAll());
@@ -113,7 +127,7 @@ void MainWindow::recvMsg()
                     bool bCheck = false;
 
                     // if ID not null , you can try to login as geust
-                    if(CGBDataManager::Instance().getID().size()!=0)
+                    if(m_ID!=0&&m_Password==0)
                     {
                         QMessageBox msgBox;
                         msgBox.setText("Do you want to login as geust ?");
@@ -121,29 +135,60 @@ void MainWindow::recvMsg()
                         int nCheck = msgBox.exec();
                         if(nCheck == QMessageBox::Ok)
                         {
-                            connectServer(true);
+                            connectServer();
+                            sendLoginData(true);
                         }
                         else
                         {
+
                             bCheck = true;
                         }
                     }
                     else
                     {
+                        QMessageBox msgBox;
+                        msgBox.setText("등록되지 않은 ID 이거나 잘못된 Password 를 입력 하셨습니다.");
+                        msgBox.exec();
                         bCheck = true;
                     }
 
-                    if(bCheck = true)
+                    if(bCheck == true)
                     {
                         this->hide();
                         m_login.show();
                         m_login.setEnabled(true);
                     }
-
-
-
-
                 }
+            }
+            else if(msgType == DEF_TYPE_SIGN_UP)
+            {
+                QByteArray arr;
+                dataStream>>arr;
+                QString str;
+                str.append(arr.data()); // ID
+
+                if(str.compare("DUPLICATE_ID")==0)
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("사용할수 없는 ID 입니다.");
+                    msgBox.exec();
+                }
+                else if(str.compare("DUPLICATE_NAME")==0)
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText("사용할수 없는 Name 입니다.");
+                    msgBox.exec();
+                }
+                else
+                {
+                    QMessageBox msgBox;
+                    msgBox.setText(m_ID+"님 회원가입을 축하드립니다.");
+                    msgBox.exec();
+                    m_login.m_SignUpDlg.initData();
+                    m_login.m_SignUpDlg.close();
+                }
+
+                qDebug() << str;
             }
             break;
         }
@@ -154,10 +199,48 @@ void MainWindow::recvMsg()
 void MainWindow::reciveData(const QString &text)
 {
     qDebug() << "test :" <<text;
-    if(connectServer() == false)
+
+    if(text.compare("Login_Dialog_Button_OK") == 0)
     {
-        m_login.setEnabled(true);
-        m_login.show();
+        m_ID = CGBDataManager::Instance().getID();
+        m_Password = CGBDataManager::Instance().getPassword();
+
+
+        qDebug() <<  m_Port << " " << m_Ip;
+
+        if(connectServer() == false)
+        {
+            m_login.setEnabled(true);
+            m_login.show();
+        }
+        else
+        {
+            sendLoginData();
+        }
+    }
+    else if(text.compare("SignUp_Dialog_Button_Accept") == 0)
+    {
+        m_ID = CGBDataManager::Instance().getID();
+        m_Password = CGBDataManager::Instance().getPassword();
+        m_Name = CGBDataManager::Instance().getName();
+        m_Status = CGBDataManager::Instance().getStatus();
+
+        if(connectServer() == false)
+        {
+
+        }
+        else
+        {
+            sendSignUp();
+        }
+
+
+    }
+    else if(text.compare("Set_Settings")== 0)
+    {
+        m_Port = CGBDataManager::Instance().getPort();
+        m_Ip = CGBDataManager::Instance().getIp();
+        qDebug() <<  m_Port << " " << m_Ip;
     }
 }
 
@@ -172,6 +255,11 @@ void MainWindow::on_lineEdit_msg_returnPressed()
     dataStream<<quint16(0);
 
     QString strData = ui->lineEdit_msg->text().toUtf8();
+
+
+    if(strData.size()==0)
+        return;
+
     QString strBuffer;
     if(strData.toUtf8().at(0) == '#')
     {
@@ -189,19 +277,26 @@ void MainWindow::on_lineEdit_msg_returnPressed()
         }
         strData = strBuffer;
         qDebug() << "채널" << strBuffer << "접속 시도";
+
+        QByteArray buffer(strData.toUtf8());
+        dataStream<<quint16(buffer.size());
+        qDebug() << m_ID.toUtf8();
+        dataStream<<m_ID.toUtf8();
+        dataStream<<buffer;
     }
     else
     {
         dataStream<<DEF_TYPE_MESSAGE;
+        strData.toUtf8();
+        dataStream<<quint16(strData.toUtf8().size()+m_ID.toUtf8().size());
+        qDebug() << m_ID.toUtf8();
+        dataStream<<m_ID.toUtf8();
+        dataStream<<strData.toUtf8();
     }
 
 
-    QByteArray buffer(strData.toUtf8());
-    dataStream<<quint16(buffer.size());
-    qDebug() << CGBDataManager::Instance().getID().toUtf8();
-    dataStream<<CGBDataManager::Instance().getID().toUtf8();
-    dataStream<<buffer;
-    dataStream.device()->seek(0);
+
+
 /*
     quint16 test;
     dataStream >> test;
@@ -269,4 +364,9 @@ void MainWindow::on_pushButton_fileSend_clicked()
     //소켓으로 전송
     m_socket.write(block);
     ui->lineEdit_msg->clear();
+}
+
+void MainWindow::on_pushButton_msgSend_clicked()
+{
+    on_lineEdit_msg_returnPressed();
 }
