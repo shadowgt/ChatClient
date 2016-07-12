@@ -17,7 +17,7 @@ CLoginDlg::~CLoginDlg()
     delete ui;
 }
 
-void CLoginDlg::initData()
+void CLoginDlg::clear()
 {
     ui->lineEdit_ID->setText("");
     ui->lineEdit_Password->setText("");

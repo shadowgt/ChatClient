@@ -26,7 +26,7 @@ public:
     CSettingsDlg m_SettingsDlg;
     CSignUpDlg m_SignUpDlg;
 
-    void initData();
+    void clear();
 
 
 private slots:

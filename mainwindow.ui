@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>685</width>
-    <height>245</height>
+    <height>241</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
      <item row="0" column="0" colspan="2">
       <widget class="QTextEdit" name="textEdit"/>
      </item>
-     <item row="1" column="0">
+     <item row="1" column="0" colspan="2">
       <widget class="QLineEdit" name="lineEdit_msg"/>
      </item>
     </layout>
@@ -42,9 +42,6 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="0" colspan="2">
-      <widget class="QListView" name="listView"/>
-     </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="pushButton_msgSend">
        <property name="text">
@@ -58,6 +55,9 @@
         <string>File</string>
        </property>
       </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QListWidget" name="listWidget"/>
      </item>
     </layout>
    </widget>

@@ -25,6 +25,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void requireChatMember();
+
 public slots:
     void recvMsg();
     void reciveData(const QString &text);
@@ -35,6 +37,7 @@ private slots:
     void on_pushButton_fileSend_clicked();
 
     void on_pushButton_msgSend_clicked();
+
 
 private:
     CLoginDlg m_login;

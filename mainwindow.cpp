@@ -41,9 +41,10 @@ void MainWindow::recvMsg()
     {
         if(nextBlockSize == 0)
         {
+            qDebug() << "nextBlockSize == 0";
             //수신된 데이터가 nextBlockSize 바이트보다 큰지 확인
             if(tcpSocket->bytesAvailable() < sizeof(quint16))
-                ;
+                qDebug() << "tcpSocket->bytesAvailable() < sizeof(quint16)";
             else
             {
                 dataStream>>msgType;
@@ -76,7 +77,6 @@ void MainWindow::recvMsg()
 
                 //str.append(arr.toHex()); // ID
                 ui->textEdit->append(buffer);
-                nextBlockSize = 0;
 
             }
             else if(msgType == DEF_TYPE_CHANNEL_CHANGE)
@@ -90,7 +90,8 @@ void MainWindow::recvMsg()
                 ui->textEdit->append(str);
                 ui->textEdit->setFontUnderline(false);
 
-                nextBlockSize = 0;
+                requireChatMember();
+
             }
             else if(msgType == DEF_TYPE_FILE)
             {
@@ -118,6 +119,9 @@ void MainWindow::recvMsg()
                     ui->textEdit->append("#everyone channel joined");
                     this->show();
                     m_login.hide();
+                    m_login.clear();
+
+                    requireChatMember();
                 }
                 else
                 {
@@ -190,6 +194,24 @@ void MainWindow::recvMsg()
 
                 qDebug() << str;
             }
+            else if(msgType == DEF_TYPE_REQUIRE_MEMBERS_INFO)
+            {
+                QByteArray arr;
+                quint16 nSize;
+                dataStream>>nSize;
+
+                qDebug() << "size :" << nSize;
+                QString str;
+
+                ui->listWidget->clear();
+                for(int i = 0; i < nSize ;i++)
+                {
+                    dataStream>>arr;
+                    str = arr.data();
+                    ui->listWidget->addItem(str);
+                }
+            }
+            nextBlockSize = 0;
             break;
         }
     }
@@ -244,7 +266,21 @@ void MainWindow::reciveData(const QString &text)
     }
 }
 
+void MainWindow::requireChatMember()
+{
+    QString str("requireChatMember");
+    QByteArray block,buffer;
+    QDataStream dataStream(&block , QIODevice::ReadWrite);
+    dataStream<<quint16(0);
 
+    dataStream<<DEF_TYPE_REQUIRE_MEMBERS_INFO;
+    buffer.append(str);
+    dataStream<<quint16(buffer.size());
+    dataStream<<str.toUtf8();
+
+    qDebug() << "requireChatMember";
+    m_socket.write(block);
+}
 
 
 void MainWindow::on_lineEdit_msg_returnPressed()
@@ -279,7 +315,7 @@ void MainWindow::on_lineEdit_msg_returnPressed()
         qDebug() << "채널" << strBuffer << "접속 시도";
 
         QByteArray buffer(strData.toUtf8());
-        dataStream<<quint16(buffer.size());
+        dataStream<<quint16(buffer.size()+m_ID.toUtf8().size());
         qDebug() << m_ID.toUtf8();
         dataStream<<m_ID.toUtf8();
         dataStream<<buffer;
